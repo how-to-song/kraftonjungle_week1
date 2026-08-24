@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# secrets (절대 커밋 금지)
+.env
+
+# uploads (사용자 사진, 스펙 §8)
+uploads/
+static/uploads/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
