@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- 구글폰트 -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Stylish&display=swap"
+      rel="stylesheet"
+    />
+
+    <title> 정글러 찾기 </title>
+
+<style>
+  .hint-text {
+    color: #1f2937;
+    font-size:35pt;
+    text-align: center;
+  }
+</style>
+ </head>
+
+
+<body
+class="min-h-screen bg-cover bg-center bg-no-repeat"
+style="background-image: url('/static/images/background.jpg');"
+
+<!-- <body> -->
+
+    <div class="px-30 mt-10">
+<h1 class="text-4xl font-bold mb-10">
+  정글러 찾기
+</h1>
+    <div class="hint-text mb-10">
+  <div class="grid grid-cols-1 gap-4">
+
+ <div class="relative h-20 rounded-full bg-gray-200">
+  힌트1
+
+</div>
+ <div class="relative h-20 rounded-full bg-gray-200">
+  힌트2
+  <div
+    id="cover2"
+    class="absolute inset-0 rounded-full bg-gray-500"
+  ></div>
+</div>
+ <div class="relative h-20 rounded-full bg-gray-200">
+  힌트3
+  <div
+    id="cover3"
+    class="absolute inset-0 rounded-full bg-gray-500"
+  ></div>
+</div>
+ <div class="relative h-20 rounded-full bg-gray-200">
+  힌트4
+  <div
+    id="cover4"
+    class="absolute inset-0 rounded-full bg-gray-500"
+  ></div>
+
+
+
+
+
+
+</div>
+
+  </div>
+   </div>
+
+
+    <div class="grid grid-cols-5 gap-5">
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(true)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
+
+
+    </div>
+</div>
+   </body>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+  let wrongCount = 0;
+
+  function checkAnswer(isCorrect) {
+    if (isCorrect) {
+      document.getElementById("cover2").style.display = "none";
+      document.getElementById("cover3").style.display = "none";
+      document.getElementById("cover4").style.display = "none";
+      let score = 100 - wrongCount * 20;
+      alert("정답입니다! 점수: " + score);
+      return;
+    }
+
+    wrongCount = wrongCount + 1;
+
+    if (wrongCount === 1) {
+      document.getElementById("cover2").style.display = "none";
+    }
+
+    if (wrongCount === 2) {
+      document.getElementById("cover3").style.display = "none";
+    }
+
+    if (wrongCount === 3) {
+      document.getElementById("cover4").style.display = "none";
+    }
+
+    alert("오답입니다. 힌트가 추가로 공개됩니다.");
+  }
+</script>
+</html>

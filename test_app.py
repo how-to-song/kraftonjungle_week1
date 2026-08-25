@@ -70,7 +70,7 @@ class LoginPageTest(unittest.TestCase):
         response = client.get("/game")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("게임 페이지", response.get_data(as_text=True))
+        self.assertIn("정글러 찾기", response.get_data(as_text=True))
 
     def test_get_game_with_invalid_token_redirects_to_login(self):
         client = app.test_client()
