@@ -1,10 +1,15 @@
-import os
+import os, uuid
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from flask import Flask, render_template, request
 
+from datetime import datetime, timezone
+
 load_dotenv()
 client = MongoClient(os.environ["MONGO_URI"])
+db = client["findjunglerdb"]
+users = db["users"]
+
 
 app = Flask(__name__)
 
@@ -14,6 +19,11 @@ def signup():
         username = request.form.get("username", "").strip()
         if not (4 <= len(username) <= 20):
             return render_template("signup.html", error_message="아이디는 4~20자 입니다.")
+        if not (username.isascii() and username.isalnum()):
+            return render_template("signup.html", error_message="아이디는 영문과 숫자만 가능합니다.")
+        if users.find_one({"username": username}):
+            return render_template("signup.html", error_message="이미 사용중인 아이디입니다.")
+
         
         password = request.form.get("password", "").strip()
         if (len(password) < 8):
@@ -26,6 +36,14 @@ def signup():
         photo = request.files.get("profile_image")
         if photo is None or photo.filename == "":
             return render_template("signup.html", error_message="프로필 사진은 필수입니다.")
+        ext = photo.filename.rsplit(".", 1)[-1].lower()
+        if ext not in ["jpg", "jpeg", "png"]:
+            return render_template("signup.html", error_message=".jpg, .jpeg, .png만 가능합니다.")
+        photo.seek(0, 2)
+        size = photo.tell()
+        photo.seek(0)
+        if (size > 5 * 1024 * 1024):
+            return render_template("signup.html", error_message="사진은 5MB 이하만 가능합니다.")
         
         name = request.form.get("name", "").strip()
         if (name == ""):
@@ -37,6 +55,30 @@ def signup():
                 return render_template("signup.html", error_message="특징은 2~30자 입니다.")
             if normalize(name) in normalize(feature):
                 return render_template("signup.html", error_message="특징에는 이름을 넣을 수 없습니다.")
+            
+        filename = f"{uuid.uuid4().hex}.{ext}"
+        save_path = os.path.join("static","uploads", filename)
+        os.makedirs("static/uploads", exist_ok=True)
+        photo.save(save_path)
+        
+        image_path = f"/static/uploads/{filename}"
+        
+            
+        now = datetime.now(timezone.utc)
+        
+        result = users.insert_one({
+            "username": username,
+            "password_hash": "TODO_HASH",
+            "name":name,
+            "features": features,
+            "profile_image": image_path,
+            "total_score": 0,
+            "created_at": now,
+            "updated_at":now,
+        })
+        new_id = result.inserted_id
+        return "가입 성공!"
+            
             
     return render_template("signup.html")
 
