@@ -137,6 +137,24 @@ def edit():
             
     return render_template("edit.html", edit_user=edit_user)
 
+@app.route("/ranking", methods=["GET"])
+def ranking():
+    ranked = list(users.find({"total_score": {"$gt": 0}}).sort("total_score", -1))
+    
+    prev_score = None
+    prev_rank = 0
+    for entry in ranked:
+        if entry["total_score"] == prev_score:
+            rank = prev_rank
+        else:
+            rank = prev_rank + 1
+        entry["rank"] = rank
+        prev_rank = rank
+        prev_score = entry["total_score"]
+        
+    
+    return render_template("ranking.html", ranking_entries=ranked, max_score=ranked[0]["total_score"])
+
 def normalize(s):
     return s.replace(" ", "").lower()
 
