@@ -16,6 +16,7 @@
     <h1 class="text-5xl font-bold p-10 flex justify-center"> 랭킹표 </h1>
 
     <div class="rounded-md bg-gray-300 m-10 p-5 space-y-4">
+        {% if ranking_entries %}
         {% for entry in ranking_entries %}
         <div class="flex items-center gap-4">
             <!-- 왼쪽: 순위 + 사진 + 이름 (고정 폭) -->
@@ -28,13 +29,16 @@
             <!-- 오른쪽: 막대 (남은 폭 다 차지) -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1 bg-gray-200 rounded-full h-6">
-                    <div class="bg-lime-500 h-6 rounded-full" style="width: {{ (entry.total_score / max_score * 100) | round }}%"></div>
+                    <div class="bg-lime-500 h-6 rounded-full"
+                        style="width: {{ (entry.total_score / max_score * 100) | round }}%"></div>
                 </div>
                 <span class="font-bold w-14 text-right">{{ entry.total_score }}점</span>
             </div>
-
         </div>
         {% endfor %}
+        {% else %}
+        <p class="text-center text-gray-500">아직 랭킹에 오른 정글러가 없습니다. </p>
+        {% endif %}
     </div>
 
 </body>

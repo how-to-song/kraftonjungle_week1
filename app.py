@@ -152,8 +152,10 @@ def ranking():
         prev_rank = rank
         prev_score = entry["total_score"]
         
+    max_score = ranked[0]["total_score"] if ranked else 1
+        
     
-    return render_template("ranking.html", ranking_entries=ranked, max_score=ranked[0]["total_score"])
+    return render_template("ranking.html", ranking_entries=ranked, max_score=max_score)
 
 def normalize(s):
     return s.replace(" ", "").lower()
