@@ -76,11 +76,66 @@ def signup():
             "created_at": now,
             "updated_at":now,
         })
-        new_id = result.inserted_id
         return "가입 성공!"
             
             
     return render_template("signup.html")
+
+@app.route("/edit", methods=["GET", "POST"])
+def edit():
+    edit_user = users.find_one({"username": "song03621"})
+    
+    if request.method == "POST":
+        photo = request.files.get("profile_image")
+        if photo and photo.filename:
+            ext = photo.filename.rsplit(".", 1)[-1].lower()
+            if ext not in ["jpg", "jpeg", "png"]:
+                return render_template("edit.html", error_message=".jpg, .jpeg, .png만 가능합니다.", edit_user=edit_user)
+            photo.seek(0, 2)
+            size = photo.tell()
+            photo.seek(0)
+            if (size > 5 * 1024 * 1024):
+                return render_template("edit.html", error_message="사진은 5MB 이하만 가능합니다.", edit_user=edit_user)
+            filename = f"{uuid.uuid4().hex}.{ext}"
+            save_path = os.path.join("static","uploads", filename)
+            os.makedirs("static/uploads", exist_ok=True)
+            photo.save(save_path)
+        
+            image_path = f"/static/uploads/{filename}"
+            
+        name = request.form.get("name", "").strip()
+        if (name == ""):
+            return render_template("edit.html", error_message="이름을 꼭 넣어야합니다.", edit_user=edit_user)
+        
+        features = [request.form.get(f"feature{i}", "").strip() for i in range(1, 5)]
+        for feature in features:
+            if not (2 <= len(feature) <= 30):
+                return render_template("edit.html", error_message="특징은 2~30자 입니다.", edit_user=edit_user)
+            if normalize(name) in normalize(feature):
+                return render_template("edit.html", error_message="특징에는 이름을 넣을 수 없습니다.", edit_user=edit_user)
+            
+
+        
+            
+        now = datetime.now(timezone.utc)
+        
+        set_data = {
+            "name": name,
+            "features": features,
+            "updated_at": now,   
+        }
+        if photo and photo.filename:
+            set_data["profile_image"] = image_path
+        
+        users.update_one(
+            {"_id": edit_user["_id"]},
+            {"$set": set_data}
+        )
+        
+        return "수정 성공!"
+            
+            
+    return render_template("edit.html", edit_user=edit_user)
 
 def normalize(s):
     return s.replace(" ", "").lower()

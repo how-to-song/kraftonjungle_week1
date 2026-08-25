@@ -9,10 +9,10 @@
 </head>
 
 <body class="bg-gray-200 min-h-screen">
-    <form method="post" action="/signup" enctype="multipart/form-data">
+    <form method="post" action="/edit" enctype="multipart/form-data">
         <div class="bg-white rounded-lg shadow my-10 max-w-md mx-auto p-10">
             <div class="space-y-4">
-                <h1 class="text-2xl font-bold"> 회원가입 </h1>
+                <h1 class="text-2xl font-bold"> 회원정보 수정 </h1>
 
                 {% if error_message %}
                 <div class="bg-red-50 text-red-700 border border-red-200 rounded-md p-3 text-sm">{{ error_message }}
@@ -20,31 +20,34 @@
                 {% endif %}
 
                 <div>
-                    <input name="username" type="text"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    <input name="username" type="text" readonly
+                        value="{{ edit_user.username }}"
+                        class="w-full border border-gray-300 bg-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-not-allowed"
                         placeholder="아이디 입력(4~20자)" />
                 </div>
 
                 <div>
-                    <input name="password" type="password"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="비밀번호 입력(8자 이상)" />
+                    <input name="password" type="password" readonly
+                        class="w-full border border-gray-300 bg-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-not-allowed"
+                        placeholder="비밀번호" />
                 </div>
 
                 <div>
-                    <input name="password_confirm" type="password"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    <input name="password_confirm" type="password" readonly
+                        class="w-full border border-gray-300 bg-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-not-allowed"
                         placeholder="비밀번호 확인" />
                 </div>
 
                 <div>
                     <label>프로필 사진</label>
+                    <img src="{{ edit_user.profile_image}}" width="100">
                     <input name="profile_image" type="file" accept=".jpg,.jpeg,.png"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
 
                 <div>
                     <input name="name" type="text"
+                        value="{{ edit_user.name }}"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         placeholder="이름을 입력해주세요." />
                 </div>
@@ -57,20 +60,20 @@
 
                     <textarea name="feature1"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="특징을 입력하세요"></textarea>
+                        placeholder="특징을 입력하세요">{{ edit_user.features[0]}}</textarea>
                     <textarea name="feature2"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="특징을 입력하세요"></textarea>
+                        placeholder="특징을 입력하세요">{{ edit_user.features[1]}}</textarea>
                     <textarea name="feature3"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="특징을 입력하세요"></textarea>
+                        placeholder="특징을 입력하세요">{{ edit_user.features[2]}}</textarea>
                     <textarea name="feature4"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="특징을 입력하세요"></textarea>
+                        placeholder="특징을 입력하세요">{{ edit_user.features[3]}}</textarea>
                 </div>
 
                 <div class="flex justify-center">
-                    <button type="submit" class="bg-lime-500 text-2xl font-bold text-white rounded-md p-3">가입하기</button>
+                    <button type="submit" class="bg-lime-500 text-2xl font-bold text-white rounded-md p-3">저장하기</button>
                 </div>
             </div>
         </div>
