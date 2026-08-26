@@ -17,6 +17,13 @@
 
 
     <h1 class="text-5xl font-bold flex justify-center my-3">로그인</h1>
+
+    {% if request.args.get('kicked') %}
+    <p class="text-red-500 text-center font-bold my-3">
+      다른 기기에서 로그인되어 종료되었습니다.
+    </p>
+    {% endif %}
+
     {% if error_message %}
     <p>{{ error_message }}</p>
     {% endif %}
