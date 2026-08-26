@@ -199,5 +199,23 @@ class LoginPageTest(unittest.TestCase):
         response = app.test_client().get("/signup")
         self.assertEqual(response.status_code, 200)
 
+    def test_get_edit_with_valid_login_cookie_shows_current_user(self):
+        client = app.test_client()
+
+        client.post(
+            "/login",
+            data={
+                "username": "song03621",
+                "password": "testpassword123",
+            },
+        )
+
+        response = client.get("/edit")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("song03621", html)
+
+
 if __name__ == "__main__":
     unittest.main()
