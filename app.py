@@ -35,6 +35,15 @@ def login_required(view_function):
                 options={"require": ["sub", "iat", "exp"]},
             )
             g.user_id = payload["sub"]
+            token_sid = payload.get("sid")
+            user = users.find_one({"_id": ObjectId(g.user_id)})
+            if user is None or user.get("active_session_id") != token_sid:
+                if request.path.startswith("/api/"):
+                    return jsonify({"error": "다른 기기 로그인"}), 401
+                resp = make_response(redirect("/login?kicked=1"))
+                resp.delete_cookie("access_token", path="/")
+                return resp
+               
         except jwt.InvalidTokenError:
             response = make_response(redirect("/login"))
             response.delete_cookie("access_token", path="/")
@@ -47,10 +56,18 @@ def login_required(view_function):
 
 def create_auth_response(user_id):
     now = datetime.now(timezone.utc)
+    
+    session_id = uuid.uuid4().hex
+    users.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {"active_session_id": session_id}}
+            )
+    
     payload = {
         "sub": str(user_id),
         "iat": now,
         "exp": now + timedelta(hours=8),
+        "sid": session_id,
     }
     access_token = jwt.encode(
         payload,
