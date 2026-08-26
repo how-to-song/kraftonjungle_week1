@@ -7,17 +7,21 @@
     <title>정글러 찾기</title>
 
     <!-- 구글폰트 -->
+
     <link
       href="https://fonts.googleapis.com/css?family=Stylish&display=swap"
       rel="stylesheet"
     />
   </head>
 
-  <body class="bg-gray-200 min-h-screen">
+ <body
+class="min-h-screen"
+style="background-image: url('/static/images/background.jpg');">
     <form method="post" action="/logout">
       <button type="submit">로그아웃</button>
     </form>
     <h1 class="text-5xl font-bold p-10 flex justify-center">랭킹표</h1>
+
 
     <div class="rounded-md bg-gray-300 m-10 p-5 space-y-4">
       {% if ranking_entries %} {% for entry in ranking_entries %}
