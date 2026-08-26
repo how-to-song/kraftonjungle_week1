@@ -76,11 +76,11 @@ style="background-image: url('/static/images/background.jpg');"
 
 
     <div class="grid grid-cols-5 gap-5">
-        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
-        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
-        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(true)"></button>
-        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
-        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(false)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(1)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(2)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(3)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(4)"></button>
+        <button class="h-32 rounded bg-gray-300" onclick="checkAnswer(5)"></button>
 
 
     </div>
@@ -94,30 +94,29 @@ style="background-image: url('/static/images/background.jpg');"
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script>
+
+<script>
+  const correctAnswer = {{ answer | tojson }};
   let wrongCount = 0;
 
-  function checkAnswer(isCorrect) {
-    if (isCorrect) {
+  function checkAnswer(selectedAnswer) {
+    if (selectedAnswer === correctAnswer) {
       document.getElementById("cover2").style.display = "none";
       document.getElementById("cover3").style.display = "none";
       document.getElementById("cover4").style.display = "none";
-      let score = 100 - wrongCount * 20;
+
+      const score = Math.max(0, 100 - wrongCount * 20);
       alert("정답입니다! 점수: " + score);
       return;
     }
 
-    wrongCount = wrongCount + 1;
+    wrongCount += 1;
 
     if (wrongCount === 1) {
       document.getElementById("cover2").style.display = "none";
-    }
-
-    if (wrongCount === 2) {
+    } else if (wrongCount === 2) {
       document.getElementById("cover3").style.display = "none";
-    }
-
-    if (wrongCount === 3) {
+    } else if (wrongCount === 3) {
       document.getElementById("cover4").style.display = "none";
     }
 
