@@ -1,48 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <title>정글러 찾기</title>
 
     <!-- 구글폰트 -->
-    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet" />
-</head>
 
-<body
+    <link
+      href="https://fonts.googleapis.com/css?family=Stylish&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+ <body
 class="min-h-screen"
 style="background-image: url('/static/images/background.jpg');">
+    <form method="post" action="/logout">
+      <button type="submit">로그아웃</button>
+    </form>
+    <h1 class="text-5xl font-bold p-10 flex justify-center">랭킹표</h1>
 
-    <h1 class="text-5xl font-bold p-10 flex justify-center"> 랭킹표 </h1>
 
     <div class="rounded-md bg-gray-300 m-10 p-5 space-y-4">
-        {% if ranking_entries %}
-        {% for entry in ranking_entries %}
-        <div class="flex items-center gap-4">
-            <!-- 왼쪽: 순위 + 사진 + 이름 (고정 폭) -->
-            <div class="flex items-center gap-3 w-40 shrink-0">
-                <span class="font-bold">{{ entry.rank }}</span>
-                <img src="{{ entry.profile_image }}" class="w-10 h-10 rounded-full object-cover">
-                <span>{{ entry.name }}</span>
-            </div>
-
-            <!-- 오른쪽: 막대 (남은 폭 다 차지) -->
-            <div class="flex-1 flex items-center gap-2">
-                <div class="flex-1 bg-gray-200 rounded-full h-6">
-                    <div class="bg-lime-500 h-6 rounded-full"
-                        style="width: {{ (entry.total_score / max_score * 100) | round }}%"></div>
-                </div>
-                <span class="font-bold w-14 text-right">{{ entry.total_score }}점</span>
-            </div>
+      {% if ranking_entries %} {% for entry in ranking_entries %}
+      <div class="flex items-center gap-4">
+        <!-- 왼쪽: 순위 + 사진 + 이름 (고정 폭) -->
+        <div class="flex items-center gap-3 w-40 shrink-0">
+          <span class="font-bold">{{ entry.rank }}</span>
+          <img
+            src="{{ entry.profile_image }}"
+            class="w-10 h-10 rounded-full object-cover"
+          />
+          <span>{{ entry.name }}</span>
         </div>
-        {% endfor %}
-        {% else %}
-        <p class="text-center text-gray-500">아직 랭킹에 오른 정글러가 없습니다. </p>
-        {% endif %}
+
+        <!-- 오른쪽: 막대 (남은 폭 다 차지) -->
+        <div class="flex-1 flex items-center gap-2">
+          <div class="flex-1 bg-gray-200 rounded-full h-6">
+            <div
+              class="bg-lime-500 h-6 rounded-full"
+              style="width: {{ (entry.total_score / max_score * 100) | round }}%"
+            ></div>
+          </div>
+          <span class="font-bold w-14 text-right"
+            >{{ entry.total_score }}점</span
+          >
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <p class="text-center text-gray-500">
+        아직 랭킹에 오른 정글러가 없습니다.
+      </p>
+      {% endif %}
     </div>
-
-</body>
-
+  </body>
 </html>
