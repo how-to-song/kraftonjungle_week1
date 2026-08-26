@@ -31,10 +31,13 @@ def login_required(view_function):
                 access_token,
                 os.environ["JWT_SECRET_KEY"],
                 algorithms=["HS256"],
+                options={"require": ["sub", "iat", "exp"]},
             )
             g.user_id = payload["sub"]
         except jwt.InvalidTokenError:
-            return redirect("/login")
+            response = make_response(redirect("/login"))
+            response.delete_cookie("access_token", path="/")
+            return response
 
         return view_function(*args, **kwargs)
 
