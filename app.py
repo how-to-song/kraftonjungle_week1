@@ -66,6 +66,12 @@ def create_auth_response(user_id):
     return response
 
 
+@app.route("/")
+@login_required
+def root():
+    return redirect("/game")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
