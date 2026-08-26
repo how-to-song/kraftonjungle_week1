@@ -40,6 +40,31 @@ def login_required(view_function):
     return wrapped_view
 
 
+def create_auth_response(user_id):
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": str(user_id),
+        "iat": now,
+        "exp": now + timedelta(hours=8),
+    }
+    access_token = jwt.encode(
+        payload,
+        os.environ["JWT_SECRET_KEY"],
+        algorithm="HS256",
+    )
+    response = make_response(redirect("/game"))
+    response.set_cookie(
+        "access_token",
+        access_token,
+        max_age=8 * 60 * 60,
+        httponly=True,
+        samesite="Lax",
+        secure=False,
+        path="/",
+    )
+    return response
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -70,30 +95,7 @@ def login():
                 error_message="아이디 또는 비밀번호가 올바르지 않습니다.",
             )
 
-        now = datetime.now(timezone.utc)
-        payload = {
-            "sub": str(user["_id"]),
-            "iat": now,
-            "exp": now + timedelta(hours=8),
-        }
-
-        access_token = jwt.encode(
-            payload,
-            os.environ["JWT_SECRET_KEY"],
-            algorithm="HS256",
-        )
-
-        response = make_response(redirect("/game"))
-        response.set_cookie(
-            "access_token",
-            access_token,
-            max_age=8 * 60 * 60,
-            httponly=True,
-            samesite="Lax",
-            secure=False,
-            path="/",
-        )
-        return response
+        return create_auth_response(user["_id"])
 
     return render_template("login.html")
 
@@ -194,28 +196,7 @@ def signup():
                 "updated_at": now,
             }
         )
-        payload = {
-            "sub": str(result.inserted_id),
-            "iat": now,
-            "exp": now + timedelta(hours=8),
-        }
-        access_token = jwt.encode(
-            payload,
-            os.environ["JWT_SECRET_KEY"],
-            algorithm="HS256",
-        )
-        response = make_response(redirect("/game"))
-        response.set_cookie(
-            "access_token",
-            access_token,
-            max_age=8 * 60 * 60,
-            httponly=True,
-            samesite="Lax",
-            secure=False,
-            path="/",
-        )
-        return response
-
+        return create_auth_response(result.inserted_id)
     return render_template("signup.html")
 
 

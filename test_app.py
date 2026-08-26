@@ -195,6 +195,9 @@ class LoginPageTest(unittest.TestCase):
                 {"sub", "iat", "exp"},
             )
 
+    def test_get_signup_returns_200(self):
+        response = app.test_client().get("/signup")
+        self.assertEqual(response.status_code, 200)
 
 if __name__ == "__main__":
     unittest.main()
