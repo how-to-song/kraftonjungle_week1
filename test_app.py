@@ -1,5 +1,8 @@
 import unittest
 from app import app
+import os
+import jwt
+from datetime import datetime, timedelta, timezone
 
 class LoginPageTest(unittest.TestCase):
     def test_get_login_returns_200(self):
@@ -99,6 +102,41 @@ class LoginPageTest(unittest.TestCase):
         self.assertEqual(logout_response.headers["Location"], "/login")
         self.assertEqual(game_response.status_code, 302)
         self.assertEqual(game_response.headers["Location"], "/login")
+
+    def test_get_game_with_expired_token_redirects_to_login(self):
+        client = app.test_client()
+        now = datetime.now(timezone.utc)
+        expired_at = now - timedelta(hours=1)
+        payload = {
+            "sub": "test-user-id",
+            "iat": now - timedelta(hours=2),
+            "exp": expired_at,
+        }
+        expired_token = jwt.encode(
+            payload,
+            os.environ["JWT_SECRET_KEY"],
+            algorithm="HS256",
+        )
+
+        client.set_cookie("access_token", expired_token)
+        response = client.get("/game")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/login")
+
+    def test_get_edit_without_token_redirects_to_login(self):
+        client = app.test_client()
+        response = client.get("/edit")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/login")
+
+    def test_get_ranking_without_token_redirects_to_login(self):
+        client = app.test_client()
+        response = client.get("/ranking")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/login")
 
 if __name__ == "__main__":
     unittest.main()

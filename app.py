@@ -166,6 +166,7 @@ def signup():
     return render_template("signup.html")
 
 @app.route("/edit", methods=["GET", "POST"])
+@login_required
 def edit():
     edit_user = users.find_one({"username": "song03621"})
 
@@ -222,6 +223,7 @@ def edit():
     return render_template("edit.html", edit_user=edit_user)
 
 @app.route("/ranking", methods=["GET"])
+@login_required
 def ranking():
     ranked = list(users.find({"total_score": {"$gt": 0}}).sort("total_score", -1))
     
