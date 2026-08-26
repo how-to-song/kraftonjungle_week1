@@ -96,6 +96,9 @@ class LoginPageTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/login")
+        set_cookie_header = response.headers.get("Set-Cookie", "")
+        self.assertIn("access_token=;", set_cookie_header)
+        self.assertIn("Max-Age=0", set_cookie_header)
 
     def test_logout_clears_access_token_cookie(self):
         client = app.test_client()
@@ -136,6 +139,10 @@ class LoginPageTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/login")
+
+        set_cookie_header = response.headers.get("Set-Cookie", "")
+        self.assertIn("access_token=;", set_cookie_header)
+        self.assertIn("Max-Age=0", set_cookie_header)
 
     def test_get_edit_without_token_redirects_to_login(self):
         client = app.test_client()
@@ -215,6 +222,50 @@ class LoginPageTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("song03621", html)
+
+    def test_get_root_without_token_redirects_to_login(self):
+        client = app.test_client()
+        response = client.get("/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/login")
+
+    def test_get_root_with_valid_login_cookie_redirects_to_game(self):
+        client = app.test_client()
+        client.post(
+            "/login",
+            data={
+                "username": "song03621",
+                "password": "testpassword123",
+            },
+        )
+        response = client.get("/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/game")
+
+    def test_get_game_with_token_missing_exp_redirects_to_login(self):
+        client = app.test_client()
+        now = datetime.now(timezone.utc)
+        payload = {
+            "sub": "test-user-id",
+            "iat": now,
+        }
+        token_without_exp = jwt.encode(
+            payload,
+            os.environ["JWT_SECRET_KEY"],
+            algorithm="HS256",
+        )
+
+        client.set_cookie("access_token", token_without_exp)
+        response = client.get("/game")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/login")
+
+        set_cookie_header = response.headers.get("Set-Cookie", "")
+        self.assertIn("access_token=;", set_cookie_header)
+        self.assertIn("Max-Age=0", set_cookie_header)
 
 
 if __name__ == "__main__":
