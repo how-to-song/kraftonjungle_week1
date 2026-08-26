@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -8,52 +9,60 @@
 
     <!-- 구글폰트 -->
 
-    <link
-      href="https://fonts.googleapis.com/css?family=Stylish&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet" />
+    <style>
+        .startbutton {
+            font-size: 24pt;
+            text-align: center;
+        }
+    </style>
 
- <body
-class="min-h-screen"
-style="background-image: url('/static/images/background.jpg');">
-    <form method="post" action="/logout">
-      <button type="submit">로그아웃</button>
-    </form>
-    <h1 class="text-5xl font-bold p-10 flex justify-center">랭킹표</h1>
+</head>
+
+<body class="min-h-screen" style="background-image: url('/static/images/background.jpg');">
+    
+    <div class="m-5 flex justify-end">
+        <form method="post" action="/logout">
+            <a href="/edit" class="bg-lime-600 text-xl font-bold text-white rounded-md p-3 m-3">회원정보 수정</a>            
+            <button type="submit" class="bg-red-600 text-xl font-bold text-white rounded-md p-3">로그아웃</button>
+        </form>
+    </div>
+
+    <h1 class="text-7xl font-bold mb-3 text-green-700 [text-shadow:-2px_-2px_0_#fff,2px_-2px_0_#fff,-2px_2px_0_#fff,2px_2px_0_#fff] flex justify-center">랭킹표</h1>
 
 
     <div class="rounded-md bg-gray-300 m-10 p-5 space-y-4">
-      {% if ranking_entries %} {% for entry in ranking_entries %}
-      <div class="flex items-center gap-4">
-        <!-- 왼쪽: 순위 + 사진 + 이름 (고정 폭) -->
-        <div class="flex items-center gap-3 w-40 shrink-0">
-          <span class="font-bold">{{ entry.rank }}</span>
-          <img
-            src="{{ entry.profile_image }}"
-            class="w-10 h-10 rounded-full object-cover"
-          />
-          <span>{{ entry.name }}</span>
-        </div>
+        {% if ranking_entries %} {% for entry in ranking_entries %}
+        <div class="flex items-center gap-4">
+            <!-- 왼쪽: 순위 + 사진 + 이름 (고정 폭) -->
+            <div class="flex items-center gap-3 w-40 shrink-0">
+                <span class="font-bold">{{ entry.rank }}</span>
+                <img src="{{ entry.profile_image }}" class="w-10 h-10 rounded-full object-cover" />
+                <span>{{ entry.name }}</span>
+            </div>
 
-        <!-- 오른쪽: 막대 (남은 폭 다 차지) -->
-        <div class="flex-1 flex items-center gap-2">
-          <div class="flex-1 bg-gray-200 rounded-full h-6">
-            <div
-              class="bg-lime-500 h-6 rounded-full"
-              style="width: {{ (entry.total_score / max_score * 100) | round }}%"
-            ></div>
-          </div>
-          <span class="font-bold w-14 text-right"
-            >{{ entry.total_score }}점</span
-          >
+            <!-- 오른쪽: 막대 (남은 폭 다 차지) -->
+            <div class="flex-1 flex items-center gap-2">
+                <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-lime-500 h-6 rounded-full"
+                        style="width: {{ (entry.total_score / max_score * 100) | round }}%"></div>
+                </div>
+                <span class="font-bold w-14 text-right">{{ entry.total_score }}점</span>
+            </div>
         </div>
-      </div>
-      {% endfor %} {% else %}
-      <p class="text-center text-gray-500">
-        아직 랭킹에 오른 정글러가 없습니다.
-      </p>
-      {% endif %}
+        {% endfor %} {% else %}
+        <p class="text-center text-gray-500">
+            아직 랭킹에 오른 정글러가 없습니다.
+        </p>
+        {% endif %}
     </div>
-  </body>
+
+    <div class="startbutton mt-5">
+        <a href="./game"
+            class="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">
+            다시하기
+        </a>
+    </div>
+</body>
+
 </html>
