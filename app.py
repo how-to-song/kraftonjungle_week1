@@ -1,5 +1,6 @@
 import os
 import uuid
+import random
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
@@ -16,6 +17,36 @@ db = client["findjunglerdb"]
 users = db["users"]
 
 app = Flask(__name__)
+
+
+
+
+
+
+@app.route("/", methods=["GET", "POST"])
+
+def loadgame():
+    random_users = list(
+        users.aggregate([
+            {"$sample": {"size": 5}}, ])
+    )
+    answer = random.randint(1, 5)
+    answer_user = random_users[answer - 1]
+
+    if request.method == "POST":
+        return redirect("/")
+
+
+    return render_template(
+        "index.html",
+        players=random_users,
+        answer=answer,
+        hints=answer_user["features"]
+    )
+
+
+
+
 
 
 def login_required(view_function):
