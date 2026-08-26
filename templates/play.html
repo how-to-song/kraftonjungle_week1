@@ -35,21 +35,22 @@
   <!-- <body> -->
 
   <div class="px-30 mt-10">
-    <div class="flex justify-center mb-10">
-      <h1 class="text-7xl font-bold mb-3 text-green-700 [text-shadow:-2px_-2px_0_#fff,2px_-2px_0_#fff,-2px_2px_0_#fff,2px_2px_0_#fff]">
+    <div class="mb-10">
+      <h1 class="flex justify-center text-7xl font-bold mb-3 text-green-700 [text-shadow:-2px_-2px_0_#fff,2px_-2px_0_#fff,-2px_2px_0_#fff,2px_2px_0_#fff]">
         정글탐정
       </h1>
 
-      <form action="/api/game/next" method="POST" class="inline">
-        {% if q_number >= 5 %}
-        <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 끝!!! </button>
-        {% elif q_number == 4 %}
-        <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 마지막 문제! </button>
-        {% else %}
-        <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 다음 문제 </button>
-        {% endif %}
-      </form>
-
+      <div class="flex justify-end">
+        <form action="/api/game/next" method="POST" class="inline">
+          {% if q_number >= 5 %}
+          <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 끝!!! </button>
+          {% elif q_number == 4 %}
+          <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 마지막 문제! </button>
+          {% else %}
+          <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 다음 문제 </button>
+          {% endif %}
+        </form>
+      </div>
 
 
     </div>
