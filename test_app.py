@@ -86,7 +86,7 @@ class LoginPageTest(unittest.TestCase):
         response = client.get("/game")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("정글러 찾기", response.get_data(as_text=True))
+        self.assertIn("정글러 맞추기", response.get_data(as_text=True))
 
     def test_get_game_with_invalid_token_redirects_to_login(self):
         client = app.test_client()
@@ -266,6 +266,11 @@ class LoginPageTest(unittest.TestCase):
         set_cookie_header = response.headers.get("Set-Cookie", "")
         self.assertIn("access_token=;", set_cookie_header)
         self.assertIn("Max-Age=0", set_cookie_header)
+
+    def test_get_login_shows_signup_link(self):
+        response = app.test_client().get("/login")
+        html = response.get_data(as_text=True)
+        self.assertIn('href="/signup"', html)
 
 
 if __name__ == "__main__":
