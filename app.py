@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from flask import Flask, g, make_response, redirect, render_template, request
 from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
+from bson import ObjectId
 
 load_dotenv()
 client = MongoClient(os.environ["MONGO_URI"])
@@ -160,14 +161,39 @@ def signup():
             "created_at": now,
             "updated_at":now,
         })
-        return "가입 성공!"
+        
+        new_id = result.inserted_id
+        
+        payload = {
+            "sub": str(new_id), 
+            "iat": now, 
+            "exp": now + timedelta(hours=8)
+            }
+        
+        access_token = jwt.encode(
+            payload, 
+            os.environ["JWT_SECRET_KEY"], 
+            algorithm="HS256"
+            )
+        response = make_response(redirect("/game"))
+        response.set_cookie(
+            "access_token", access_token, 
+            max_age=8*60*60,
+            httponly=True, 
+            samesite="Lax", 
+            secure=False, 
+            path="/"
+            )
+        return response
 
 
     return render_template("signup.html")
 
+
 @app.route("/edit", methods=["GET", "POST"])
+@login_required
 def edit():
-    edit_user = users.find_one({"username": "song03621"})
+    edit_user = users.find_one({"_id": ObjectId(g.user_id)})
 
     if request.method == "POST":
         photo = request.files.get("profile_image")
@@ -216,12 +242,14 @@ def edit():
             {"$set": set_data}
         )
 
-        return "수정 성공!"
+        return redirect("/game")
 
 
     return render_template("edit.html", edit_user=edit_user)
 
+
 @app.route("/ranking", methods=["GET"])
+@login_required
 def ranking():
     ranked = list(users.find({"total_score": {"$gt": 0}}).sort("total_score", -1))
     
