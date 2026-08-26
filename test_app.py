@@ -8,9 +8,30 @@ from unittest.mock import patch
 
 from bson import ObjectId
 from pymongo.results import InsertOneResult
+from werkzeug.security import generate_password_hash
 
 
 class LoginPageTest(unittest.TestCase):
+    def login_test_user(self, client):
+        test_user = {
+            "_id": ObjectId(),
+            "username": "song03621",
+            "password_hash": generate_password_hash("testpassword123"),
+            "name": "테스트 사용자",
+            "features": ["특징 하나", "특징 둘", "특징 셋", "특징 넷"],
+            "profile_image": "/static/images/background.jpg",
+            "total_score": 0,
+        }
+        with patch.object(users, "find_one", return_value=test_user):
+            response = client.post(
+                "/login",
+                data={
+                    "username": "song03621",
+                    "password": "testpassword123",
+                },
+            )
+        return response, test_user
+
     def test_get_login_returns_200(self):
         response = app.test_client().get("/login")
         self.assertEqual(response.status_code, 200)
@@ -51,13 +72,7 @@ class LoginPageTest(unittest.TestCase):
         self.assertIn("아이디 또는 비밀번호가 올바르지 않습니다.", html)
 
     def test_post_login_with_valid_credentials_redirects_to_game(self):
-        response = app.test_client().post(
-            "/login",
-            data={
-                "username": "song03621",
-                "password": "testpassword123",
-            },
-        )
+        response, _ = self.login_test_user(app.test_client())
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/game")
@@ -74,14 +89,7 @@ class LoginPageTest(unittest.TestCase):
 
     def test_get_game_with_valid_login_cookie_returns_200(self):
         client = app.test_client()
-
-        client.post(
-            "/login",
-            data={
-                "username": "song03621",
-                "password": "testpassword123",
-            },
-        )
+        self.login_test_user(client)
 
         response = client.get("/game")
 
@@ -102,14 +110,7 @@ class LoginPageTest(unittest.TestCase):
 
     def test_logout_clears_access_token_cookie(self):
         client = app.test_client()
-
-        client.post(
-            "/login",
-            data={
-                "username": "song03621",
-                "password": "testpassword123",
-            },
-        )
+        self.login_test_user(client)
 
         logout_response = client.post("/logout")
         game_response = client.get("/game")
@@ -208,16 +209,10 @@ class LoginPageTest(unittest.TestCase):
 
     def test_get_edit_with_valid_login_cookie_shows_current_user(self):
         client = app.test_client()
+        _, test_user = self.login_test_user(client)
 
-        client.post(
-            "/login",
-            data={
-                "username": "song03621",
-                "password": "testpassword123",
-            },
-        )
-
-        response = client.get("/edit")
+        with patch.object(users, "find_one", return_value=test_user):
+            response = client.get("/edit")
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
@@ -232,13 +227,7 @@ class LoginPageTest(unittest.TestCase):
 
     def test_get_root_with_valid_login_cookie_redirects_to_game(self):
         client = app.test_client()
-        client.post(
-            "/login",
-            data={
-                "username": "song03621",
-                "password": "testpassword123",
-            },
-        )
+        self.login_test_user(client)
         response = client.get("/")
 
         self.assertEqual(response.status_code, 302)
@@ -274,13 +263,7 @@ class LoginPageTest(unittest.TestCase):
 
     def test_get_ranking_with_valid_login_shows_logout_form(self):
         client = app.test_client()
-        client.post(
-            "/login",
-            data={
-                "username": "song03621",
-                "password": "testpassword123",
-            },
-        )
+        self.login_test_user(client)
         response = client.get("/ranking")
         html = response.get_data(as_text=True)
         self.assertEqual(response.status_code, 200)
