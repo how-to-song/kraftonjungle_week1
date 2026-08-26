@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from flask import Flask, g, make_response, redirect, render_template, request
 from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
+from bson import ObjectId
 
 load_dotenv()
 client = MongoClient(os.environ["MONGO_URI"])
@@ -184,6 +185,7 @@ def signup():
 
         now = datetime.now(timezone.utc)
         password_hash = generate_password_hash(password)
+
         result = users.insert_one(
             {
                 "username": username,
@@ -197,13 +199,14 @@ def signup():
             }
         )
         return create_auth_response(result.inserted_id)
+
     return render_template("signup.html")
 
 
 @app.route("/edit", methods=["GET", "POST"])
 @login_required
 def edit():
-    edit_user = users.find_one({"username": "song03621"})
+    edit_user = users.find_one({"_id": ObjectId(g.user_id)})
 
     if request.method == "POST":
         photo = request.files.get("profile_image")
@@ -266,7 +269,7 @@ def edit():
 
         users.update_one({"_id": edit_user["_id"]}, {"$set": set_data})
 
-        return "수정 성공!"
+        return redirect("/game")
 
     return render_template("edit.html", edit_user=edit_user)
 
