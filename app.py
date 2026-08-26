@@ -22,32 +22,7 @@ app = Flask(__name__)
 
 
 
-@app.route("/", methods=["GET", "POST"])
-
-def loadgame():
-    random_users = list(
-        users.aggregate([
-            {"$sample": {"size": 5}}, ])
-    )
-    answer = random.randint(1, 5)
-    answer_user = random_users[answer - 1]
-
-    if request.method == "POST":
-        return redirect("/")
-
-
-    return render_template(
-        "index.html",
-        players=random_users,
-        answer=answer,
-        hints=answer_user["features"]
-    )
-
- 
-
-
-
-@app.route("/game", methods=["GET", "POST"])
+@app.route("/game",)
 
 def loadgame():
     random_users = list(
@@ -67,6 +42,9 @@ def loadgame():
         answer=answer,
         hints=answer_user["features"]
     )
+
+ 
+
 
 def login_required(view_function):
     @wraps(view_function)
