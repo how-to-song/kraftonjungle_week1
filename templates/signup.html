@@ -10,8 +10,10 @@
     <!-- 구글폰트 -->
     <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet" />
 </head>
+<body
+class="min-h-screen"
+style="background-image: url('/static/images/background.jpg');">
 
-<body class="bg-gray-200 min-h-screen">
     <form method="post" action="/signup" enctype="multipart/form-data">
         <div class="bg-white rounded-lg shadow my-10 max-w-md mx-auto p-10">
             <div class="space-y-4">
@@ -21,6 +23,8 @@
                 <div class="bg-red-50 text-red-700 border border-red-200 rounded-md p-3 text-sm">{{ error_message }}
                 </div>
                 {% endif %}
+
+                
 
                 <div>
                     <input name="username" type="text"
