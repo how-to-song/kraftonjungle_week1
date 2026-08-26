@@ -272,6 +272,22 @@ class LoginPageTest(unittest.TestCase):
         html = response.get_data(as_text=True)
         self.assertIn('href="/signup"', html)
 
+    def test_get_ranking_with_valid_login_shows_logout_form(self):
+        client = app.test_client()
+        client.post(
+            "/login",
+            data={
+                "username": "song03621",
+                "password": "testpassword123",
+            },
+        )
+        response = client.get("/ranking")
+        html = response.get_data(as_text=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('action="/logout"', html)
+        self.assertIn('method="post"', html)
+        self.assertIn("로그아웃", html)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -19,32 +19,6 @@ users = db["users"]
 app = Flask(__name__)
 
 
-
-
-
-@app.route("/game",)
-
-def loadgame():
-    random_users = list(
-        users.aggregate([
-            {"$sample": {"size": 5}}, ])
-    )
-    answer = random.randint(1, 5)
-    answer_user = random_users[answer - 1]
-
-    if request.method == "POST":
-        return redirect("/game")
-
-
-    return render_template(
-        "game.html",
-        players=random_users,
-        answer=answer,
-        hints=answer_user["features"]
-    )
-
- 
-
 def login_required(view_function):
     @wraps(view_function)
     def wrapped_view(*args, **kwargs):
