@@ -6,7 +6,7 @@ from functools import wraps
 
 import jwt
 from dotenv import load_dotenv
-from flask import Flask, g, make_response, redirect, render_template, request
+from flask import Flask, g, jsonify, make_response, redirect, render_template, request
 from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
 from bson import ObjectId
@@ -110,30 +110,125 @@ def login():
 
     return render_template("login.html")
 
-
-@app.route("/game", methods=["GET", "POST"])
-@login_required
-def game():
-    random_users = list(users.aggregate([{"$sample": {"size": 5}}]))
-    answer = random.randint(1, 5)
-    answer_user = random_users[answer - 1]
-
-    if request.method == "POST":
-        return redirect("/game")
-
-    return render_template(
-        "game.html",
-        players=random_users,
-        answer=answer,
-        hints=answer_user["features"],
-    )
-
-
 @app.route("/logout", methods=["POST"])
 def logout():
     response = make_response(redirect("/login"))
     response.delete_cookie("access_token", path="/")
     return response
+
+@app.route("/game")
+@login_required
+def startgame():
+    return render_template("start.html")
+    
+game_states = {}
+    
+@app.route("/game/play")
+@login_required
+def loadgame():
+    answers = list(
+        users.aggregate([
+            {"$match": {"_id": {"$ne": ObjectId(g.user_id)}}}, 
+            {"$sample": {"size": 5}}
+            ])
+    )
+    
+    wrongs = list(users.aggregate([
+        {"$match": {"_id": {"$nin": [ObjectId(g.user_id), answers[0]["_id"]]}}},
+        {"$sample": {"size": 4}},
+    ]))
+    
+    candidates = [answers[0]] + wrongs
+    random.shuffle(candidates)
+    
+    game_states[g.user_id] = {
+        "answers": answers,
+        "q_index": 0,
+        "set_score": 0,
+        "candidates": candidates,
+        "wrong_count": 0,
+        "revealed_hints": 1,
+        "disabled": [],
+        "solved": False,
+    }
+    
+    return render_template("play.html",
+                           candidates=candidates,
+                           hints=answers[0]["features"][:1],
+                           revealed_hints=1,
+                           q_number=game_states[g.user_id]["q_index"] + 1
+                           )
+    
+
+@app.route("/api/game/play/guess", methods=["POST"])
+@login_required
+def guess():
+    selected_id = request.form.get("candidate_id")
+    state = game_states[g.user_id]
+    answer = state["answers"][state["q_index"]]
+    if str(answer["_id"]) == selected_id:
+        state["solved"] = True
+        state["revealed_hints"] = 4
+    else:
+        state["disabled"].append(selected_id)
+        state["wrong_count"] += 1
+                
+        if state["wrong_count"] == 4:
+            state["solved"] = True
+            state["revealed_hints"] = 4
+        else:
+            state["revealed_hints"] += 1
+        
+    if state["solved"]:
+        score = 100 - 20 * state["wrong_count"]
+        state["set_score"] += score
+                    
+    is_correct = str(answer["_id"]) == selected_id
+    return jsonify({
+        "result": "correct" if is_correct else "wrong",
+        "solved":state["solved"],
+        "score": score if state["solved"] else None,
+        "revealed_hints": state["revealed_hints"],
+        "hints": answer["features"][:state["revealed_hints"]],
+        "disabled": state["disabled"],
+        "answer_id": str(answer["_id"]) if state["solved"] else None
+    })
+
+@app.route("/api/game/next", methods=["POST"])
+@login_required
+def next_question():
+    state = game_states[g.user_id]
+    state["q_index"] += 1
+
+    if state["q_index"] >= 5:
+        users.update_one(
+            {"_id": ObjectId(g.user_id)},
+            {"$inc": {"total_score": state["set_score"]}}
+        )
+        del game_states[g.user_id]
+        return redirect("/ranking")
+
+    answer = state["answers"][state["q_index"]]
+    wrongs = list(users.aggregate([
+        {"$match": {"_id": {"$nin": [ObjectId(g.user_id), answer["_id"]]}}},
+        {"$sample": {"size": 4}},
+    ]))
+
+    candidates = [answer] + wrongs
+    random.shuffle(candidates)
+
+    state["candidates"] = candidates
+    state["wrong_count"] = 0
+    state["revealed_hints"] = 1
+    state["disabled"] = []
+    state["solved"] = False
+
+    return render_template("play.html",
+                           candidates=candidates,
+                           hints=answer["features"][:1],
+                           revealed_hints=1,
+                           q_number=state["q_index"] + 1
+                           )
 
 
 @app.route("/signup", methods=["GET", "POST"])

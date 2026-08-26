@@ -1,147 +1,118 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
 
-    
-    <!-- 구글폰트 -->
-    <link
-      href="https://fonts.googleapis.com/css?family=Stylish&display=swap"
-      rel="stylesheet"
-    />
-
-    <title> 정글러 맟추기 </title>
-
-<style>
-  .hint-text {
-    color: #1f2937;
-    font-size:35pt;
-    text-align: center;
-  }
-  .name {
-    color: #0b4810;
-    font-size:20pt;
-    font-weight: 900;
-    background-color: #f6f7f8;
-  }
-  
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
 
-</style>
- </head>
+  <!-- 구글폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet" />
+
+  <title> 정글러 맟추기 </title>
+
+  <style>
+    .hint-text {
+      color: #1f2937;
+      font-size: 35pt;
+      text-align: center;
+    }
+
+    .name {
+      color: #0b4810;
+      font-size: 20pt;
+      font-weight: 900;
+      background-color: #f6f7f8;
+    }
+  </style>
+</head>
 
 
-<body
-class="min-h-screen bg-cover bg-center bg-no-repeat"
-style="background-image: url('/static/images/background.jpg');">
+<body class="min-h-screen bg-cover bg-center bg-no-repeat"
+  style="background-image: url('/static/images/background.jpg');">
 
-<!-- <body> -->
+  <!-- <body> -->
 
-    <div class="px-30 mt-10">
-<h1 class="text-4xl font-bold mb-10 bg-1">
-  정글러 맞추기 <button id="next" hidden> 다음 </button>  
-</h1>
+  <div class="px-30 mt-10">
+    <h1 class="text-4xl font-bold mb-10 bg-1">
+      정글러 맞추기 <button id="next" hidden> 다음 </button>
+    </h1>
 
     <div class="hint-text mb-10">
-  <div class="grid grid-cols-1 gap-4">
+      <div class="grid grid-cols-1 gap-4">
 
- <div class="relative h-20 rounded-full bg-gray-200">
- {{ hints[0] }} 
+        <div class="relative h-20 rounded-full bg-gray-200">
+          {{ hints[0] }}
 
-</div>
- <div class="relative h-20 rounded-full bg-gray-200">
- {{ hints[1] }} 
-  <div
-    id="cover2"
-    class="absolute inset-0 rounded-full bg-gray-500"
-  ></div>
-</div>
- <div class="relative h-20 rounded-full bg-gray-200">
- {{ hints[2] }} 
-  <div
-    id="cover3"
-    class="absolute inset-0 rounded-full bg-gray-500"
-  ></div>
-</div>
- <div class="relative h-20 rounded-full bg-gray-200">
- {{ hints[3] }} 
-  <div
-    id="cover4"
-    class="absolute inset-0 rounded-full bg-gray-500"
-  ></div>
+        </div>
+        <div class="relative h-20 rounded-full bg-gray-200">
+          {{ hints[1] }}
+          <div id="cover2" class="absolute inset-0 rounded-full bg-gray-500"></div>
+        </div>
+        <div class="relative h-20 rounded-full bg-gray-200">
+          {{ hints[2] }}
+          <div id="cover3" class="absolute inset-0 rounded-full bg-gray-500"></div>
+        </div>
+        <div class="relative h-20 rounded-full bg-gray-200">
+          {{ hints[3] }}
+          <div id="cover4" class="absolute inset-0 rounded-full bg-gray-500"></div>
 
 
 
 
 
 
-</div>
+        </div>
 
-  </div>
-   </div>
+      </div>
+    </div>
 
 
     <div class="grid grid-cols-5 gap-5">
-        <button class="aspect-square h-50 rounded bg-gray-300" onclick="checkAnswer(1)"> <img
-        src="{{ players[0].profile_image }}"
-        class="h-full w-full object-cover"> <div class=name> {{ players[0].name }} </div> </button>
-        <button class="aspect-square h-50 rounded bg-gray-300" onclick="checkAnswer(2)"> <img
-        src="{{ players[1].profile_image }}"
-        class="h-full w-full object-cover"> <div class=name> {{ players[1].name }} </div> </button>
-        <button class="aspect-square h-50 rounded bg-gray-300" onclick="checkAnswer(3)"><img
-        src="{{ players[2].profile_image }}"
-        class="h-full w-full object-cover"> <div class=name> {{ players[2].name }}</div> </button>
-        <button class="aspect-square h-50 rounded bg-gray-300" onclick="checkAnswer(4)"><img
-        src="{{ players[3].profile_image }}"
-        class="h-full w-full object-cover"> <div class=name>{{ players[3].name }}</div> </button>
-        <button class="aspect-square h-50 rounded bg-gray-300" onclick="checkAnswer(5)"><img
-        src="{{ players[4].profile_image }}"
-        class="h-full w-full object-cover"><div class=name> {{ players[4].name }}</div> </button>
+      <button class="aspect-square h-50 rounded bg-gray-300" onclick="selectedAnswer(0)"> <img
+          src="{{ candidates[0].profile_image }}" class="h-full w-full object-cover">
+        <div class=name> {{ candidates[0].name }} </div>
+      </button>
+      <button class="aspect-square h-50 rounded bg-gray-300" onclick="selectedAnswer(1)"> <img
+          src="{{ candidates[1].profile_image }}" class="h-full w-full object-cover">
+        <div class=name> {{ candidates[1].name }} </div>
+      </button>
+      <button class="aspect-square h-50 rounded bg-gray-300" onclick="selectedAnswer(2)"><img
+          src="{{ candidates[2].profile_image }}" class="h-full w-full object-cover">
+        <div class=name> {{ candidates[2].name }}</div>
+      </button>
+      <button class="aspect-square h-50 rounded bg-gray-300" onclick="selectedAnswer(3)"><img
+          src="{{ candidates[3].profile_image }}" class="h-full w-full object-cover">
+        <div class=name>{{ candidates[3].name }}</div>
+      </button>
+      <button class="aspect-square h-50 rounded bg-gray-300" onclick="selectedAnswer(4)"><img
+          src="{{ candidates[4].profile_image }}" class="h-full w-full object-cover">
+        <div class=name> {{ candidates[4].name }}</div>
+      </button>
 
 
     </div>
-</div>
-   </body>
-
-
-
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
+  </div>
+</body>
 
 <script>
-  const correctAnswer = {{ answer }};
-  let wrongCount = 0;
+  function selectedAnswer(n) {
+    $.ajax({
+      type:"POST",
+      url: "/api/game/guess",
+      data: {'selected': {{ candidates }}[n]},
+      
 
-  function checkAnswer(selectedAnswer) {
-    if (selectedAnswer === correctAnswer) {
-      document.getElementById("cover2").style.display = "none";
-      document.getElementById("cover3").style.display = "none";
-      document.getElementById("cover4").style.display = "none";
-      document.getElementById("next").hidden = false;
-      const score = Math.max(0, 100 - wrongCount * 20);
-      alert("정답입니다! 점수: " + score);
-      return;
-    }
-
-    wrongCount += 1;
-
-    if (wrongCount === 1) {
-      document.getElementById("cover2").style.display = "none";
-    } else if (wrongCount === 2) {
-      document.getElementById("cover3").style.display = "none";
-    } else if (wrongCount === 3) {
-      document.getElementById("cover4").style.display = "none";
-    }
-
-    alert("오답입니다. 힌트가 추가로 공개됩니다.");
+    })
   }
 </script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 </html>

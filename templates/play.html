@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+
+  <!-- 구글폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet" />
+
+  <title> 정글러 맟추기 </title>
+
+  <style>
+    .hint-text {
+      color: #1f2937;
+      font-size: 35pt;
+      text-align: center;
+    }
+
+    .name {
+      color: #0b4810;
+      font-size: 20pt;
+      font-weight: 900;
+      background-color: #f6f7f8;
+    }
+  </style>
+</head>
+
+
+<body class="min-h-screen bg-cover bg-center bg-no-repeat"
+  style="background-image: url('/static/images/background.jpg');">
+
+  <!-- <body> -->
+
+  <div class="px-30 mt-10">
+    <div class="flex items-center justify-between mb-10">
+      <h1 class="text-4xl font-bold mb-10 bg-1 ">
+        정글러 맞추기
+      </h1>
+
+      <form action="/api/game/next" method="POST" class="inline">
+        {% if q_number >= 5 %}
+        <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 끝!!! </button>
+        {% elif q_number == 4 %}
+        <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 마지막 문제! </button>
+        {% else %}
+        <button id="next" hidden class="bg-green-500 p-2 rounded-md text-2xl"> 다음 문제 </button>
+        {% endif %}
+      </form>
+
+
+
+    </div>
+
+    <div class="hint-text mb-10">
+      <div class="grid grid-cols-1 gap-4">
+        {% for i in range(4) %}
+        <div class="relative h-20 rounded-full bg-gray-200">
+          <span id="hint-{{ i }}">{{ hints[i] if i < revealed_hints else "" }}</span>
+              {% if i >= revealed_hints %}
+              <div id="cover-{{ i }}" class="absolute inset-0 rounded-full bg-gray-500"></div>
+              {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+
+    <div class="grid grid-cols-5 gap-5">
+      {% for candidate in candidates %}
+      <button id="cand-{{ candidate._id }}" class="aspect-square h-50 rounded bg-gray-300"
+        onclick="selectedAnswer('{{ candidate._id }}')"> <img src="{{ candidate.profile_image }}"
+          class="h-full w-full object-cover">
+        <div class=name> {{ candidate.name }} </div>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+  function selectedAnswer(candidate_id) {
+    $.ajax({
+      type: "POST",
+      url: "/api/game/play/guess",
+      data: { 'candidate_id': candidate_id },
+      success: function (response) {
+        $("#cand-" + candidate_id).prop("disabled", true).addClass("opacity-40")
+
+        for (let i = 0; i < response.hints.length; i++) {
+          $("#hint-" + i).text(response.hints[i]);
+          $("#cover-" + i).hide();
+        }
+
+        if (response.solved) {
+          $("button[id^='cand-']").prop("disabled", true);
+          $("#cand-" + response.answer_id).removeClass("opacity-40").addClass("ring-4").addClass("ring-green-500");
+
+          alert((response.result === "correct" ? "정답! " : "실패! ") + "점수: " + response.score)
+
+          $("#next").prop("hidden", false);
+        }
+      }
+    })
+  }
+
+</script>
+
+</html>
